@@ -20,9 +20,11 @@ if file then
     file:close()
     return
 end
+print("No existing installer found. Proceeding to download new installer...")
+os.sleep(1)
 
 print("Downloading installer.lua from LorielleOS-Mod GitHub...")
-os.sleep(2)
+os.sleep(1)
 
 ---@diagnostic disable-next-line: undefined-field
 local response = internet.request("https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/main/test.lua")
