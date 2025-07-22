@@ -2,6 +2,11 @@
 
 This is a modified version of OpenOS 1.8.6 that has been customized for use in Greg Tech New Horizons.
 
+=======USER WARNING======
+This operating system has a installation process that wipes the destination hard drive. 
+The reason for this is that OpenOS must be installed on a computer before this OS can be installed.
+-------END WARNING-------
+
 ## Features
 
 **Planned but not yet implemented:**
