@@ -1,4 +1,4 @@
-require ("internet")
+local internet = require("internet")
 
 local content = ""
 
