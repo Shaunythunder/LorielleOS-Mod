@@ -10,7 +10,7 @@ local file = io.open("installer.lua", "r")
 if file then
     print("Installer detected. Replacing old installer.")
     file:close()
-    os.remove("installer.lua")
+    os.execute("rm -rf installer.lua")
 end
 
 local file = io.open("installer.lua", "r")
