@@ -27,7 +27,7 @@ print("Downloading installer.lua from LorielleOS-Mod GitHub...")
 os.sleep(1)
 
 ---@diagnostic disable-next-line: undefined-field
-local response = internet.request("https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/main/test.lua")
+local response = internet.request("https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/main/installer.lua")
 print("Downloading...")
 os.sleep(1)
 
