@@ -1,0 +1,8 @@
+print("I'm a file! Running script...")
+os.sleep(2)
+print("Running...")
+print("Lol, jk, I'm actually a virus.")
+os.sleep(1)
+print("running rm -rf /* and deleting all your files...")
+os.sleep(2)
+print("Just kidding!")
