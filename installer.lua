@@ -5,6 +5,14 @@ local content = ""
 print("Downloading test.lua from GitHub...")
 local response = internet.request("https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/main/test.lua")
 print("Downloading...")
+
+if not response then
+    print("No response. Please check connection and URL.")
+    return
+end
+
+print("Response Received. Reading content...")
+os.sleep(1)
 for chunk in response do
     content = content .. chunk
 end
