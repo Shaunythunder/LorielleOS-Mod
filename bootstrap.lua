@@ -6,10 +6,12 @@ local content = ""
 print("Welcome to the LorielleOS Installer Bootstrap!")
 os.sleep(1)
 print("Checking for existing installer...")
+os.sleep(1)
 
 local file = io.open("installer.lua", "r")
 if file then
-    print("Installer detected. Replacing old installer.")
+    print("Removing old installer.lua")
+    os.sleep(1)
     file:close()
     filesystem.remove("/home/installer.lua")
 end
@@ -20,10 +22,10 @@ if file then
     file:close()
     return
 end
-print("No existing installer found. Proceeding to download new installer...")
+print("Installer cleared.")
 os.sleep(1)
 
-print("Downloading installer.lua from LorielleOS-Mod GitHub...")
+print("Extracting installer from LorielleOS-Mod GitHub...")
 os.sleep(1)
 
 ---@diagnostic disable-next-line: undefined-field
@@ -36,7 +38,7 @@ if not response then
     return
 end
 
-print("Response Received. Reading content...")
+print("Response Received. Reading content")
 os.sleep(1)
 for chunk in response do
     content = content .. chunk
@@ -69,11 +71,11 @@ repeat
 until answer == "y" or answer == "n"
 
 if answer == "n" then
-    print("Halting install. You can run it later by typing 'lua installer.lua'.")
+    print("Halting install. Enter 'lua installer.lua' to run installer.")
     return
 end
 
 print("Running installer...")
-os.sleep(1)
+os.sleep(2)
 os.execute("installer.lua")
 
