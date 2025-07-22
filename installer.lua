@@ -1,13 +1,24 @@
 local filesystem = require("filesystem")
 
+local wipe_exclusions = {
+    ["/home/installer.lua"] = true,
+    ["/home/bootstrap.lua"] = true,
+}
+local download_exclusions = {
+    ["/home/README.txt"] = true,
+    ["/home/license.txt"] = true,
+}
+
 local function wipeDirectory(path)
     for file in filesystem.list(path) do
         local full_path = filesystem.concat(path, file)
-        if filesystem.isDirectory(full_path) then
-            wipeDirectory(full_path) 
-            filesystem.remove(full_path)
-        else
-            filesystem.remove(full_path)
+        if not wipe_exclusions[full_path] then
+            if filesystem.isDirectory(full_path) then
+                wipeDirectory(full_path) 
+                filesystem.remove(full_path)
+            else
+                filesystem.remove(full_path)
+            end
         end
     end
 end
