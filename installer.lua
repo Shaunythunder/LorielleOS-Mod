@@ -3,6 +3,7 @@ require ("internet")
 local content = ""
 
 print("Downloading test.lua from GitHub...")
+os.sleep(4)
 local response = internet.request("https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/main/test.lua")
 print("Downloading...")
 
@@ -15,6 +16,8 @@ print("Response Received. Reading content...")
 os.sleep(1)
 for chunk in response do
     content = content .. chunk
+    print("Received chunk of size: " .. #chunk)
+    os.sleep(0.5)  -- Simulate processing time for each chunk
 end
 
 if #content == 0 then
