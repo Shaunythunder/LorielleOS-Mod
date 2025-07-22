@@ -1,4 +1,5 @@
 local internet = require("internet")
+local filesystem = require("filesystem")
 
 local content = ""
 
@@ -10,7 +11,7 @@ local file = io.open("installer.lua", "r")
 if file then
     print("Installer detected. Replacing old installer.")
     file:close()
-    os.execute("rm -rf installer.lua")
+    filesystem.remove("/home/installer.lua")
 end
 
 local file = io.open("installer.lua", "r")
