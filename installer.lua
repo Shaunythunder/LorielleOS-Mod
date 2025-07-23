@@ -78,7 +78,8 @@ print("If you would like to exit the installer, type 'exit' to cancel.")
 os.sleep(2)
 print("**************************************")
 print("Ensure installer and bootstrap are in the home directory.")
-print("If not abort install and move them to the home directory.")
+print("**************************************")
+print("If not abort install move them.")
 
 local input
 repeat
