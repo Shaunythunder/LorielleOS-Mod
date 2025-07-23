@@ -3,6 +3,10 @@ local os = require("os")
 local io = require("io")
 local internet = require("internet")
 
+local short_delay = .5
+local long_delay = 2
+local extreme_delay = 5
+
 local wipe_exclusions = {
     ["/home/installer.lua"] = true,
     ["/home/bootstrap.lua"] = true,
@@ -16,9 +20,11 @@ local function wipeDirectory(path)
                 wipeDirectory(full_path) 
                 filesystem.remove(full_path)
                 print(full_path)
+                os.sleep(short_delay) --Need to remove
             else
                 filesystem.remove(full_path)
                 print(full_path)
+                os.sleep(short_delay) --Need to remove
             end
         end
     end
@@ -43,41 +49,41 @@ end
 
 print("Welcome to the LorielleOS Installer!")
 print("*************************************")
-os.sleep(1)
+os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
 print("*************************************")
-os.sleep(1)
+os.sleep(short_delay)
 print("USER WARNING: This installer will completely")
 print("wipe your hard drive and install LorielleOS.")
 print("*************************************")
-os.sleep(2.5)
+os.sleep(long_delay)
 print("Please ensure you do not have sensitive data or")
 print("files that you need before running this installer.")
 print("*************************************")
-os.sleep(2.5)
+os.sleep(long_delay)
 print("All files will be lost forever.")
 print("*************************************")
-os.sleep(2.5)
+os.sleep(long_delay)
 print("Please backup any important data before proceeding.")
 print("*************************************")
-os.sleep(2.5)
+os.sleep(long_delay)
 print("Install failure may result in an irrecoverable hard drive.")
 print("*************************************")
-os.sleep(2.5)
+os.sleep(long_delay)
 print("For more information, please exit the installer")
 print("and type 'man install.'")
 print("*************************************")
-os.sleep(2.5)
+os.sleep(long_delay)
 print("For more information on backing up,")
 print("please exit the installer and type 'man backup.'")
 print("*************************************")
-os.sleep(5)
+os.sleep(long_delay)
 
 print("If you are sure you want to proceed, type 'install' to continue")
-os.sleep(2)
+os.sleep(short_delay)
 print("*************************************")
 print("If you would like to exit the installer, type 'exit' to cancel.")
-os.sleep(2)
+os.sleep(short_delay)
 print("**************************************")
 print("Ensure installer and bootstrap are in the home directory.")
 print("**************************************")
@@ -111,11 +117,11 @@ if input == "no" then
 end
 
 print("Proceeding with installation...")
-os.sleep(1)
+os.sleep(short_delay)
 print("Wiping hard drive...")
-os.sleep(1)
+os.sleep(short_delay)
 wipeDirectory("/")
-os.sleep(1)
+os.sleep(short_delay)
 local clean, culprit = checkCleanWipe("/", wipe_exclusions)
 if not clean then
     for i = 1, 5 do
@@ -128,11 +134,11 @@ if not clean then
 end
 if not clean then
     print("Wiped failed. Could not remove: " .. culprit)
-    os.sleep(1)
+    os.sleep(short_delay)
     print("Install can still continue, but file conflicts may occur.")
-    os.sleep(1)
+    os.sleep(short_delay)
     print("Installation may fail outright and hard drive irrecoverable.")
-    os.sleep(1)
+    os.sleep(short_delay)
     print("Continue at your own risk.")
     local response 
     repeat 
@@ -150,19 +156,19 @@ if not clean then
     end
 else
     print("Wipe successful.")
-    os.sleep(1)
+    os.sleep(short_delay)
 end
 
 print("Installing LorielleOS...")
-os.sleep(1)
+os.sleep(short_delay)
 print("Fetching install manifest...")
-os.sleep(1)
+os.sleep(short_delay)
 
 local manifest_url = "https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/main/install_manifest.txt"
 local response = internet.request(manifest_url)
 if not response then
     print("Failed to download manifest. Please check your internet connection.")
-    os.sleep(1)
+    os.sleep(short_delay)
     local input
     repeat
         print("Connect again? Hardrive may be irrecoverable")
@@ -181,13 +187,13 @@ if not response then
     if input == "no" then
         print("Install failed, hard drive may be irrecoverable. Reinstall openOS")
         print("and try again or toss the drive. Good luck!")
-        os.sleep(5)
+        os.sleep(extreme_delay)
         return
     end
 end
 
 print("Manifest found. Parsing...")
-os.sleep(1)
+os.sleep(short_delay)
 local content = ""
 
 for chunk in response do
@@ -215,7 +221,7 @@ while #content == 0 do
     if input == "no" then
         print("Install failed, hard drive may be irrecoverable. Reinstall openOS")
         print("and try again or toss the drive. Good luck!")
-        os.sleep(5)
+        os.sleep(extreme_delay)
         return
     elseif input == "yes" then
         response = internet.request(manifest_url)
@@ -224,16 +230,16 @@ while #content == 0 do
             for chunk in response do
                 content = content .. chunk
                 print("Received chunk of size: " .. #chunk)
-                os.sleep(0.5)  -- Simulate processing time for each chunk
+                os.sleep(short_delay)  -- Simulate processing time for each chunk
             end
         end
     end
 end
 
 print("Download complete. Total size: " .. #content .. " bytes")
-os.sleep(1)
+os.sleep(short_delay)
 print("Manifest downloaded successfully.")
-os.sleep(1)
+os.sleep(short_delay)
 print("Parsing manifest...")
 
 local files = {}
@@ -248,10 +254,10 @@ for _, filepath in ipairs(files) do
     local file_response = internet.request(url)
     if not file_response then
         print("Failed to download " .. filepath)
-        os.sleep(1)
+        os.sleep(short_delay)
         print("Install failed. Hard drive may be irrecoverable.")
         print("Reinstall openOS and try again or toss the drive. Good luck!")
-        os.sleep(5)
+        os.sleep(extreme_delay)
         return
     end
 
@@ -266,7 +272,7 @@ for _, filepath in ipairs(files) do
     if dir and not filesystem.exists(dir) then
         filesystem.makeDirectory(dir)
         print("Created directory: " .. dir)
-        os.sleep(1)
+        os.sleep(short_delay)
     end
 
     local file = io.open(filepath, "w")
@@ -276,17 +282,17 @@ for _, filepath in ipairs(files) do
         file:close()
     else
         print("Failed to write file: " .. filepath)
-        os.sleep(1)
+        os.sleep(short_delay)
         print("Install failed. Hard drive may be irrecoverable.")
         print("Reinstall openOS and try again or toss the drive. Good luck!")
-        os.sleep(5)
+        os.sleep(extreme_delay)
         return
     end
 end
 print("All files downloaded and installed successfully.")
-os.sleep(.5)
+os.sleep(short_delay)
 print("LorielleOS installation complete! Have fun!")
-os.sleep(.5)
+os.sleep(short_delay)
 
 input = nil
 repeat
@@ -300,7 +306,7 @@ if input == "y" then
     local file = io.open("installer.lua", "r")
     if file then
         print("Removing installer.lua...")
-        os.sleep(1)
+        os.sleep(short_delay)
         file:close()
         filesystem.remove("/home/installer.lua")
     else
@@ -310,7 +316,7 @@ if input == "y" then
     file = io.open("bootstrap.lua", "r")
     if file then
         print("Removing bootstrap.lua...")
-        os.sleep(1)
+        os.sleep(short_delay)
         file:close()
         filesystem.remove("/home/bootstrap.lua")
     else

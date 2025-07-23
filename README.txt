@@ -28,6 +28,5 @@ Features will be added as issues come up.
 3. Run the following command:
 
 
-#Command is not live yet
 ```lua
-wget https://raw.githubusercontent.com/shaunythunder/LorielleOS-mod/main/bootstrap.lua && lua bootstrap.lua
+wget https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/main/bootstrap.lua
