@@ -1,6 +1,7 @@
 local filesystem = require("filesystem")
 local os = require("os")
 local io = require("io")
+local print = print
 local internet = require("internet")
 
 local short_delay = .5
@@ -20,11 +21,9 @@ local function wipeDirectory(path)
                 wipeDirectory(full_path) 
                 filesystem.remove(full_path)
                 print(full_path)
-                os.sleep(short_delay) --Need to remove
             else
                 filesystem.remove(full_path)
                 print(full_path)
-                os.sleep(short_delay) --Need to remove
             end
         end
     end
