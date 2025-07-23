@@ -1,35 +1,18 @@
 local internet = require("internet")
 local filesystem = require("filesystem")
 
+local installer_url = "https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/main/installer.lua"
+local installer_path = "/tmp/installer.lua"
 local content = ""
 
 print("Welcome to the LorielleOS Installer Bootstrap!")
-os.sleep(1)
-print("Checking for existing installer...")
-os.sleep(1)
-
-local file = io.open("installer.lua", "r")
-if file then
-    print("Removing old installer.lua")
-    os.sleep(1)
-    file:close()
-    filesystem.remove("/home/installer.lua")
-end
-
-local file = io.open("installer.lua", "r")
-if file then
-    print("Failed to remove old installer. Please check permissions.")
-    file:close()
-    return
-end
-print("Installer cleared.")
 os.sleep(1)
 
 print("Extracting installer from LorielleOS-Mod GitHub...")
 os.sleep(1)
 
 ---@diagnostic disable-next-line: undefined-field
-local response = internet.request("https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/main/installer.lua")
+local response = internet.request(installer_url)
 print("Downloading...")
 os.sleep(1)
 
@@ -54,7 +37,7 @@ if #content == 0 then
     return
 end
 
-local file = io.open("installer.lua", "w")
+local file = io.open(installer_path, "w")
 if not file then
     print("Failed to write to file. Check permissions.")
     return
@@ -63,9 +46,6 @@ file:write(content)
 print("File written successfully.")
 os.sleep(1)
 file:close()
-
-print("Please ensure installer and bootstrap are in the home directory.")
-os.sleep(1)
 
 local answer
 repeat
@@ -80,5 +60,4 @@ end
 
 print("Running installer...")
 os.sleep(2)
-os.execute("installer.lua")
-
+os.execute("lua " .. installer_path)

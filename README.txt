@@ -29,4 +29,5 @@ Features will be added as issues come up.
 
 
 ```lua
-wget https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/main/bootstrap.lua
+wget https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/main/bootstrap.lua /tmp/bootstrap.lua
+lua /tmp/bootstrap.lua
