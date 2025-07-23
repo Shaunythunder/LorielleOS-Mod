@@ -7,16 +7,25 @@ local short_delay = .5
 local long_delay = 2
 local extreme_delay = 5
 
+local wipe_exclusions = {
+    ["/tmp/installer.lua"] = true,
+    ["/tmp/bootstrap.lua"] = true,
+}
+
 local function wipeDirectory(path)
     for file in filesystem.list(path) do
         local full_path = filesystem.concat(path, file)
-        if filesystem.isDirectory(full_path) then
-            wipeDirectory(full_path) 
-            filesystem.remove(full_path)
-            print(full_path)
-        else
-            filesystem.remove(full_path)
-            print(full_path)
+        if not wipe_exclusions[full_path] then
+            if filesystem.isDirectory(full_path) then
+                wipeDirectory(full_path) 
+                filesystem.remove(full_path)
+                print(full_path)
+                os.sleep(short_delay) --Need to remove
+            else
+                filesystem.remove(full_path)
+                print(full_path)
+                os.sleep(short_delay) --Need to remove
+            end
         end
     end
 end
@@ -25,7 +34,13 @@ local function checkCleanWipe(path, exclusions)
     for file in filesystem.list(path)do
         local full_path = filesystem.concat(path, file)
         if file ~= "." and file ~= ".." and not exclusions[full_path] then
-            if filesystem.isDirectory(full_path) then
+            if path == "/" and file == "tmp" then
+                -- Skip the tmp directory to avoid removing it
+                local clean, culprit = checkCleanWipe(full_path, exclusions)
+                if not clean then
+                    return false, culprit
+                end
+            elseif filesystem.isDirectory(full_path) then
                 local clean, culprit = checkCleanWipe(full_path, exclusions)
                 if not clean then
                     return false, culprit
@@ -76,6 +91,9 @@ print("*************************************")
 print("If you would like to exit the installer, type 'exit' to cancel.")
 os.sleep(short_delay)
 print("**************************************")
+print("Ensure installer and bootstrap are in the tmp directory.")
+print("**************************************")
+print("If not abort install move them.")
 
 local input
 repeat
@@ -281,6 +299,39 @@ print("All files downloaded and installed successfully.")
 os.sleep(short_delay)
 print("LorielleOS installation complete! Have fun!")
 os.sleep(short_delay)
+
+input = nil
+repeat
+    io.write("Would you like to remove installation files? (y/n): ")
+    input = io.read()
+    if input then
+        input = input:lower()
+    end
+until input == "y" or input == "n"
+if input == "y" then
+    local file = io.open("installer.lua", "r")
+    if file then
+        print("Removing installer.lua...")
+        os.sleep(short_delay)
+        file:close()
+        filesystem.remove("/tmp/installer.lua")
+    else
+        print("No installer.lua found to remove.")
+    end
+
+    file = io.open("bootstrap.lua", "r")
+    if file then
+        print("Removing bootstrap.lua...")
+        os.sleep(short_delay)
+        file:close()
+        filesystem.remove("/tmp/bootstrap.lua")
+    else
+        print("No bootstrap.lua found to remove.")
+    end
+
+else
+    print("Installer files retained. You can run the installer again later.")
+end
 
 input = nil
 repeat
