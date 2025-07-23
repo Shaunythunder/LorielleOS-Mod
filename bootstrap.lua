@@ -64,6 +64,9 @@ print("File written successfully.")
 os.sleep(1)
 file:close()
 
+print("Please ensure installer and bootstrap are in the home directory.")
+os.sleep(1)
+
 local answer
 repeat
     io.write("Do you want to run the installer now? (y/n): ")
