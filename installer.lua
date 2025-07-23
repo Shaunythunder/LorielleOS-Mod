@@ -93,16 +93,16 @@ if input == "exit" then
     return
 end
 
-local answer
+input = nil
 repeat
     io.write("***POINT OF NO RETURN*** Proceed? (yes/no): ")
-    answer = io.read()
-    if answer then 
-        answer = answer:lower() 
+    input = io.read()
+    if input then 
+        input = input:lower() 
     end
-until answer == "yes" or answer == "no"
+until input == "yes" or input == "no"
 
-if answer == "no" then
+if input == "no" then
     print("Exiting installer. You can run it later by typing 'lua installer.lua'.")
     return
 end
@@ -152,10 +152,10 @@ end
 
 print("Installing LorielleOS...")
 os.sleep(1)
-print("Fetchinng install manifest...")
+print("Fetching install manifest...")
 os.sleep(1)
 
-local manifest_url = "PLACEHOLDER_FOR_MANIFEST_URL"
+local manifest_url = "https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/main/install_manifest.txt"
 local response = internet.request(manifest_url)
 if not response then
     print("Failed to download manifest. Please check your internet connection.")
@@ -193,7 +193,7 @@ for chunk in response do
     os.sleep(0.5)  -- Simulate processing time for each chunk
 end
 
-local input
+input = nil
 while #content == 0 do
    print("Failed to download manifest. Please check your internet connection.")
     os.sleep(1)
@@ -285,7 +285,7 @@ os.sleep(.5)
 print("LorielleOS installation complete! Have fun!")
 os.sleep(.5)
 
-local input
+input = nil
 repeat
     io.write("Would you like to remove installation files? (y/n): ")
     input = io.read()
@@ -318,7 +318,7 @@ else
     print("Installer files retained. You can run the installer again later.")
 end
 
-local input
+input = nil
 repeat
     io.write("Would you like to reboot? (y/n): ")
     input = io.read()
