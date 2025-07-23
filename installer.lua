@@ -15,8 +15,10 @@ local function wipeDirectory(path)
             if filesystem.isDirectory(full_path) then
                 wipeDirectory(full_path) 
                 filesystem.remove(full_path)
+                print(full_path)
             else
                 filesystem.remove(full_path)
+                print(full_path)
             end
         end
     end
