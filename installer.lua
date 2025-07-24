@@ -172,7 +172,7 @@ end
 
 --- >>> PROPOSAL: ADD THIS DEBUGGING BLOCK HERE <<<
 print("Attempting a critical test write to root...")
-local test_file, test_err = io.open("/test_write.tmp", "w")
+local test_file, test_err = io.open("/init.lua", "w")
 if test_file then
     test_file:write("This is a test line to confirm root writability after a full wipe.")
     test_file:close()
