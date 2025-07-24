@@ -51,7 +51,7 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Imager/Installer v0.5!")
+print("Welcome to the LorielleOS Installer/Disk Imager v1.0 Alpha!")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
@@ -174,7 +174,7 @@ if not clean then
         return
     end
 else
-    os.sleep(10)
+    os.sleep(1)
     print("Wipe successful.")
     os.sleep(short_delay)
 end
@@ -253,7 +253,6 @@ while #content == 0 do
     end
 end
 
-print("Download complete. Total size: " .. #content .. " bytes")
 os.sleep(short_delay)
 print("Manifest downloaded successfully.")
 os.sleep(short_delay)
@@ -299,7 +298,7 @@ for _, filepath in ipairs(files) do
     else
         print("Failed to open file for writing: " .. filepath .. ". Error: " .. tostring(open_err))
         os.sleep(short_delay)
-        print("This means you picked a read only drive.")
+        print("This means you picked a read only drive. Computer needs to be restarted.")
         print("Run the installer and try again. Good luck!")
         os.sleep(extreme_delay)
         return
@@ -309,5 +308,5 @@ print("All files downloaded and installed on disk.")
 os.sleep(short_delay)
 print("LorielleOS installation complete!")
 os.sleep(short_delay)
-print("You can now install LorielleOS on a blank hard drive.")
+print("If you are running this on a hard drive, remove any floppy disks and reboot the computer.")
 os.sleep(short_delay)

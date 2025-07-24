@@ -29,5 +29,5 @@ Features will be added as issues come up.
 
 
 ```lua
-wget https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/disc_imager_start/bootstrap.lua /tmp/installer.lua
+wget https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/disc_imager_start/disk_imager.lua /tmp/disk_imager.lua
 lua /tmp/bootstrap.lua
