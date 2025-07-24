@@ -160,6 +160,7 @@ if not clean then
         return
     end
 else
+    os.sleep(10)
     print("Wipe successful.")
     os.sleep(short_delay)
 end
