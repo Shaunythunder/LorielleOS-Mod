@@ -5,16 +5,18 @@ local installer_url = "https://raw.githubusercontent.com/Shaunythunder/LorielleO
 local installer_path = "/tmp/installer.lua"
 local content = ""
 
+local short_delay = 0.5
+
 print("Welcome to the LorielleOS Installer Bootstrap!")
-os.sleep(1)
+os.sleep(short_delay)
 
 print("Extracting installer from LorielleOS-Mod GitHub...")
-os.sleep(1)
+os.sleep(short_delay)
 
 ---@diagnostic disable-next-line: undefined-field
 local response = internet.request(installer_url)
 print("Downloading...")
-os.sleep(1)
+os.sleep(short_delay)
 
 if not response then
     print("No response. Please check connection and URL.")
@@ -22,15 +24,14 @@ if not response then
 end
 
 print("Response Received. Reading content")
-os.sleep(1)
+os.sleep(short_delay)
 for chunk in response do
     content = content .. chunk
     print("Received chunk of size: " .. #chunk)
-    os.sleep(0.5)  -- Simulate processing time for each chunk
 end
 
 print("Download complete. Total size: " .. #content .. " bytes")
-os.sleep(1)
+os.sleep(short_delay)
 
 if #content == 0 then
     print("Download failed. Check your connection or the URL.")
@@ -44,7 +45,7 @@ if not file then
 end
 file:write(content)
 print("File written successfully.")
-os.sleep(1)
+os.sleep(short_delay)
 file:close()
 
 local answer
