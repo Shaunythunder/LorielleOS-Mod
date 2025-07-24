@@ -4,6 +4,8 @@ import os
 excluded_files = {'README.txt', 
            'generate_manifest.py', 
            'install_manifest.txt',
+           'bootstrap.lua',
+           'installer.lua',
            'license.txt',
            '.gitignore',}
 

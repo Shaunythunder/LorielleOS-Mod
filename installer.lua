@@ -301,39 +301,6 @@ os.sleep(short_delay)
 
 input = nil
 repeat
-    io.write("Would you like to remove installation files? (y/n): ")
-    input = io.read()
-    if input then
-        input = input:lower()
-    end
-until input == "y" or input == "n"
-if input == "y" then
-    local file = io.open("installer.lua", "r")
-    if file then
-        print("Removing installer.lua...")
-        os.sleep(short_delay)
-        file:close()
-        filesystem.remove("/tmp/installer.lua")
-    else
-        print("No installer.lua found to remove.")
-    end
-
-    file = io.open("bootstrap.lua", "r")
-    if file then
-        print("Removing bootstrap.lua...")
-        os.sleep(short_delay)
-        file:close()
-        filesystem.remove("/tmp/bootstrap.lua")
-    else
-        print("No bootstrap.lua found to remove.")
-    end
-
-else
-    print("Installer files retained. You can run the installer again later.")
-end
-
-input = nil
-repeat
     io.write("Would you like to reboot? (y/n): ")
     input = io.read()
     if input then

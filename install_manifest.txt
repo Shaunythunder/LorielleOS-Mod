@@ -1,7 +1,5 @@
-bootstrap.lua
 init.lua
 .prop
-installer.lua
 bin/primary.lua
 bin/edit.lua
 bin/ln.lua
