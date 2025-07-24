@@ -286,7 +286,8 @@ for _, filepath in ipairs(files) do
         print(filepath)
         file:close()
     else
-        print("Failed to write file: " .. filepath)
+        -- This is the line to add/modify:
+        print("!!! CRITICAL ERROR: Failed to open file for writing: " .. filepath .. ". Error: " .. tostring(open_err))
         os.sleep(short_delay)
         print("Install failed. Hard drive may be irrecoverable.")
         print("Reinstall openOS and try again or toss the drive. Good luck!")
