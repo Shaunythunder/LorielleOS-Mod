@@ -12,7 +12,6 @@ local extreme_delay = 5
 local wipe_exclusions = {
     ["/tmp"] = true,
     ["/tmp/installer.lua"] = true,
-    ["/tmp/bootstrap.lua"] = true,
 }
 
 local function wipeDirectory(path)
@@ -52,7 +51,7 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Imager/Installer v0.3!")
+print("Welcome to the LorielleOS Imager/Installer v0.5!")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
