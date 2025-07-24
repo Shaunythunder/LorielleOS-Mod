@@ -46,7 +46,7 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Imager/Installer v0.2!")
+print("Welcome to the LorielleOS Imager/Installer v0.3!")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
@@ -79,6 +79,7 @@ end
 input = nil
 local target_mnt = nil
 local valid_mnt = false
+local mnt_path = nil
 repeat
     print("Please ensure you have either a hard drive or floppy disk mounted at /mnt/*target*.")
     print("Make sure you don't enter the mount of the current OS (OpenOS flopppy or OS hard drive).")
@@ -92,8 +93,8 @@ repeat
         print("Invalid input. Please enter exactly 3 characters.")
     end
     if #input == 3 then
-        local target_mnt = input:lower()
-        local mnt_path = "/mnt/" .. target_mnt .. "/"
+        target_mnt = input:lower()
+        mnt_path = "/mnt/" .. target_mnt .. "/"
         if filesystem.exists(mnt_path) and filesystem.isDirectory(mnt_path) then
             valid_mnt = true
         else
@@ -103,13 +104,22 @@ repeat
     if input == "info" then
         print("To find the floppy or hard drive address, follow these steps:")
         print("1. Exit the installer.")
+        os.sleep(long_delay)
         print("2. Type cd to get to home.")
+        os.sleep(long_delay)
         print("3. Then type cd .., cd mnt, ls. This will show you the mounted directories.")
+        os.sleep(long_delay)
         print("4. Remove floppy and type ls again.")
+        os.sleep(long_delay)
         print("5. Put the floppy back in and type ls again. the three character code that appears is the floppy address.")
+        os.sleep(long_delay)
         print("The three digit code that stays is your hard drive address.")
+        os.sleep(long_delay)
         print("DO NOT USE THE HARD DRIVE ADDRESS. If there are multiple drives you'll see multiple codes.")
+        os.sleep(long_delay)
         print("6. Type cd to return to home, then run the installer again.")
+        os.sleep(long_delay)
+        
     end
 
 until valid_mnt or input == "exit"
