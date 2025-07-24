@@ -109,16 +109,6 @@ print("Proceeding with installation...")
 os.sleep(short_delay)
 print("Wiping hard drive...")
 os.sleep(short_delay)
-
-local ok_kill, err_kill = pcall(process.killAll)
-if not ok_kill then
-    print("Warning: Failed to terminate background processes (process.killAll might not exist or failed): " .. tostring(err_kill))
-    os.sleep(short_delay)
-else
-    print("Background processes termination attempted.")
-    os.sleep(long_delay) -- Give some time for processes to actually terminate
-end
-
 wipeDirectory("/")
 os.sleep(short_delay)
 local clean, culprit = checkCleanWipe("/", wipe_exclusions)
