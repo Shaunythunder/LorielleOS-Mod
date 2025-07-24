@@ -9,20 +9,9 @@ local short_delay = .5
 local long_delay = 2
 local extreme_delay = 5
 
-local wipe_exclusions = {
-    ["/tmp"] = true,
-    ["/tmp/installer.lua"] = true,
-    ["/tmp/bootstrap.lua"] = true,
-}
-
 local function wipeDirectory(path)
     for file in filesystem.list(path) do
         local full_path = filesystem.concat(path, file)
-        if wipe_exclusions[full_path] then
-            print("Skipping excluded path: " .. full_path)
-            os.sleep(short_delay)
-        end
-        if not wipe_exclusions[full_path] then
             if filesystem.isDirectory(full_path) then
                 wipeDirectory(full_path) 
                 filesystem.remove(full_path)
@@ -31,7 +20,6 @@ local function wipeDirectory(path)
                 filesystem.remove(full_path)
                 print("Removed file: " .. full_path)
             end
-        end
     end
 end
 
@@ -58,14 +46,14 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Installer! Version 35")
+print("Welcome to the LorielleOS Imager!")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
 print("*************************************")
 os.sleep(short_delay)
-print("USER WARNING: This installer will completely")
-print("wipe your hard drive and install LorielleOS.")
+print("USER WARNING: This imager will completely")
+print("wipe your disk and install LorielleOS.")
 print("*************************************")
 os.sleep(short_delay)
 print("If you are sure you want to proceed, type 'install' to continue")
@@ -74,13 +62,10 @@ print("*************************************")
 print("If you would like to exit the installer, type 'exit' to cancel.")
 os.sleep(short_delay)
 print("**************************************")
-print("Ensure installer and bootstrap are in the tmp directory.")
-print("**************************************")
-print("If not abort install move them.")
 
 local input
 repeat
-    io.write("Wipe hard drive and install? (install/exit):")
+    io.write("Wipe disk and install? (install/exit):")
     input = io.read()
     if input then 
         input = input:lower()
@@ -92,24 +77,54 @@ if input == "exit" then
 end
 
 input = nil
+target_mnt = nil
+local valid_mnt = false
 repeat
-    io.write("***POINT OF NO RETURN*** Proceed? (yes/no): ")
+    print("Please ensure you have a floppy disk mounted at /mnt/*floppy*.")
+    print("Make sure you don't enter the hard drive mount.")
+    print("or files may be wiped and install will fail.")
+    io.write("Input 3 character target mnt (type exit to quit, or type info for how to find floppy address): ")
     input = io.read()
     if input then 
         input = input:lower() 
     end
-until input == "yes" or input == "no"
+    if input and #input ~= 3 and input ~= "exit" and input ~= "info" then
+        print("Invalid input. Please enter exactly 3 characters.")
+    end
+    if #input == 3 then
+        target_mnt = input:lower()
+        local mnt_path = "/mnt/" .. target_mnt .. "/"
+        if filesystem.exists(mnt_path) and filesystem.isDirectory(mnt_path) then
+            valid_mnt = true
+        else
+            print("Mount point does not exist or is not a directory. Please try again.")
+        end
+    end
+    if input == "info" then
+        print("To find the floppy address, follow these steps:")
+        print("1. Exit the installer.")
+        print("2. Type cd to get to home.")
+        print("3. Then type cd .., cd mnt, ls. This will show you the mounted directories.")
+        print("4. Remove floppy and type ls again.")
+        print("5. Put the floppy back in and type ls again. the three character code that appears is the floppy address.")
+        print("The three digit code that stays is your hard drive address.")
+        print("DO NOT USE THE HARD DRIVE ADDRESS. If there are multiple drives you'll see multiple codes.")
+        print("6. Type cd to return to home, then run the installer again.")
+    end
 
-if input == "no" then
+until valid_mnt or input == "exit"
+if input == "exit" then
     print("Exiting installer. You can run it later by typing 'lua installer.lua'.")
     return
 end
+
+base_path = "/mnt/" .. target_mnt .. "/"
 
 print("Proceeding with installation...")
 os.sleep(short_delay)
 print("Wiping hard drive...")
 os.sleep(short_delay)
-wipeDirectory("/")
+wipeDirectory("/mnt/".. target_mnt .. "/")
 os.sleep(short_delay)
 local clean, culprit = checkCleanWipe("/", wipe_exclusions)
 if not clean then
@@ -189,7 +204,6 @@ local content = ""
 for chunk in response do
     content = content .. chunk
     print("Received chunk of size: " .. #chunk)
-    os.sleep(0.5)  -- Simulate processing time for each chunk
 end
 
 input = nil
@@ -220,7 +234,6 @@ while #content == 0 do
             for chunk in response do
                 content = content .. chunk
                 print("Received chunk of size: " .. #chunk)
-                os.sleep(short_delay)  -- Simulate processing time for each chunk
             end
         end
     end
@@ -242,6 +255,7 @@ end
 for _, filepath in ipairs(files) do
     local url = "https://raw.githubusercontent.com/shaunythunder/LorielleOS-mod/main/" .. filepath
     print("Downloading " .. filepath .. "...")
+    outpath = filesystem.concat(base_path, filepath)
     local file_response = internet.request(url)
     if not file_response then
         print("Failed to download " .. filepath)
@@ -256,20 +270,19 @@ for _, filepath in ipairs(files) do
     for chunk in file_response do
         file_content = file_content .. chunk
         print("Received chunk of size: " .. #chunk)
-        os.sleep(0.5)  -- Simulate processing time for each chunk
     end
 
-    local dir = filesystem.path(filepath)
+    local dir = filesystem.path(outpath)
     if dir and not filesystem.exists(dir) then
         filesystem.makeDirectory(dir)
         print("Created directory: " .. dir)
         os.sleep(short_delay)
     end
 
-    local file = io.open(filepath, "w")
+    local file = io.open(outpath, "w")
     if file then
         file:write(file_content)
-        print(filepath)
+        print(outpath)
         file:close()
     else
         -- This is the line to add/modify:
@@ -281,22 +294,9 @@ for _, filepath in ipairs(files) do
         return
     end
 end
-print("All files downloaded and installed successfully.")
+print("All files downloaded and installed on disk.")
 os.sleep(short_delay)
-print("LorielleOS installation complete! Have fun!")
+print("LorielleOS installation complete!")
 os.sleep(short_delay)
-
-input = nil
-repeat
-    io.write("Would you like to reboot? (y/n): ")
-    input = io.read()
-    if input then
-        input = input:lower()
-    end
-until input == "y" or input == "n"
-
-if input == "y" then
-    os.restart()
-else
-    return
-end
+print("You can now install LorielleOS on a blank hard drive.")
+os.sleep(short_delay)

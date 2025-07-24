@@ -5,7 +5,7 @@ excluded_files = {'README.txt',
            'generate_manifest.py', 
            'install_manifest.txt',
            'bootstrap.lua',
-           'installer.lua',
+           'disk_imager.lua',
            'license.txt',
            '.gitignore',}
 
