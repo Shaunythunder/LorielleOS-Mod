@@ -178,12 +178,6 @@ if test_file then
     test_file:close()
     print("Test write successful to /test_write.tmp")
     -- Clean up the test file immediately
-    local remove_success, remove_err = filesystem.remove("/test_write.tmp")
-    if not remove_success then
-        print("Warning: Failed to remove test file /test_write.tmp: " .. tostring(remove_err))
-    else
-        print("Test file removed.")
-    end
 else
     print("!!! CRITICAL TEST WRITE FAILED to /test_write.tmp. Error: " .. tostring(test_err))
     print("This indicates a fundamental issue with root directory writability after wipe.")
@@ -280,6 +274,7 @@ local files = {}
 
 for line in content:gmatch("[^\r\n]+") do
     table.insert(files, line)
+
 end
 
 for _, filepath in ipairs(files) do
