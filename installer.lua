@@ -149,22 +149,74 @@ else
     os.sleep(short_delay)
 end
 
---- >>> PROPOSAL: ADD THIS DEBUGGING BLOCK HERE <<<
-print("Attempting a critical test write to root...")
-local test_file, test_err = io.open("/init.lua", "w")
-if test_file then
-    test_file:write("This is a test line to confirm root writability after a full wipe.")
-    test_file:close()
-    print("Test write successful to /test_write.tmp")
-    -- Clean up the test file immediately
+-- If not, adjust 'first_filepath' accordingly or add a check.
+local first_filepath = files[1]
+local first_file_url = "https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/main/" .. first_filepath
+
+print("Attempting to write the first OS file: " .. first_filepath .. " (with retries if needed)...")
+
+local first_file_content = ""
+local first_file_response = internet.request(first_file_url)
+if first_file_response then
+    for chunk in first_file_response do
+        first_file_content = first_file_content .. chunk
+    end
 else
-    print("!!! CRITICAL TEST WRITE FAILED to /test_write.tmp. Error: " .. tostring(test_err))
-    print("This indicates a fundamental issue with root directory writability after wipe.")
+    print("!!! ERROR: Could not download first OS file (" .. first_filepath .. ") for test. Check URL/connection.")
+    os.sleep(extreme_delay)
+    return
+end
+if #first_file_content == 0 then
+    print("!!! ERROR: Downloaded content for first OS file (" .. first_filepath .. ") is empty for test.")
+    os.sleep(extreme_delay)
+    return
+end
+
+local first_dir = filesystem.path(first_filepath)
+-- Ensure parent directory for the first file, only if it's not the root
+if #first_dir > 0 and not filesystem.exists(first_dir) then 
+    local mk_dir_success, mk_dir_err = filesystem.makeDirectory(first_dir)
+    if not mk_dir_success then
+        print("!!! CRITICAL ERROR: Failed to create directory for first file: " .. first_dir .. ". Error: " .. tostring(mk_dir_err))
+        print("Installation cannot proceed.")
+        os.sleep(extreme_delay)
+        return
+    end
+    print("Created directory for first file: " .. first_dir)
+    os.sleep(short_delay)
+end
+
+
+local max_retries = 5
+local retry_count = 0
+local first_file_written = false
+
+while not first_file_written and retry_count < max_retries do
+    local file, open_err = io.open("/" .. first_filepath, "w") -- Ensure full path for root files
+    if file then
+        file:write(first_file_content)
+        file:close()
+        print("Successfully wrote first file: " .. first_filepath)
+        first_file_written = true
+    else
+        retry_count = retry_count + 1
+        print("!!! WARNING: Failed to write " .. first_filepath .. " (Attempt " .. retry_count .. "/" .. max_retries .. "). Error: " .. tostring(open_err))
+        os.sleep(long_delay) -- Longer delay for retries
+    end
+end
+
+if not first_file_written then
+    print("!!! CRITICAL ERROR: Failed to write " .. first_filepath .. " after multiple retries.")
     print("Installation cannot proceed. Hard drive may be irrecoverable.")
     os.sleep(extreme_delay)
-    return -- Abort if even a test write fails
+    return
 end
--- >>> END OF PROPOSAL BLOCK <<<
+
+-- Remove the first file from the 'files' table so the main loop doesn't try to write it again
+table.remove(files, 1) 
+
+-- >>> END OF NEW LOGIC <<<
+
 
 print("Installing LorielleOS...")
 os.sleep(short_delay)
