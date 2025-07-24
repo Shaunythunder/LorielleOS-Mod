@@ -1,7 +1,7 @@
 local internet = require("internet")
 local filesystem = require("filesystem")
 
-local imager_url = "https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/main/disk_imager.lua"
+local imager_url = "https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/disc_imager_start/disk_imager.lua"
 local imager_path = "/tmp/disk_imager.lua"
 local content = ""
 
