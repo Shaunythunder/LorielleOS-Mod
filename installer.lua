@@ -170,6 +170,29 @@ else
     os.sleep(short_delay)
 end
 
+--- >>> PROPOSAL: ADD THIS DEBUGGING BLOCK HERE <<<
+print("Attempting a critical test write to root...")
+local test_file, test_err = io.open("/test_write.tmp", "w")
+if test_file then
+    test_file:write("This is a test line to confirm root writability after a full wipe.")
+    test_file:close()
+    print("Test write successful to /test_write.tmp")
+    -- Clean up the test file immediately
+    local remove_success, remove_err = filesystem.remove("/test_write.tmp")
+    if not remove_success then
+        print("Warning: Failed to remove test file /test_write.tmp: " .. tostring(remove_err))
+    else
+        print("Test file removed.")
+    end
+else
+    print("!!! CRITICAL TEST WRITE FAILED to /test_write.tmp. Error: " .. tostring(test_err))
+    print("This indicates a fundamental issue with root directory writability after wipe.")
+    print("Installation cannot proceed. Hard drive may be irrecoverable.")
+    os.sleep(extreme_delay)
+    return -- Abort if even a test write fails
+end
+-- >>> END OF PROPOSAL BLOCK <<<
+
 print("Installing LorielleOS...")
 os.sleep(short_delay)
 print("Fetching install manifest...")
