@@ -9,6 +9,7 @@ local long_delay = 2
 local extreme_delay = 5
 
 local wipe_exclusions = {
+    ["/tmp"] = true,
     ["/tmp/installer.lua"] = true,
     ["/tmp/bootstrap.lua"] = true,
 }
@@ -16,14 +17,18 @@ local wipe_exclusions = {
 local function wipeDirectory(path)
     for file in filesystem.list(path) do
         local full_path = filesystem.concat(path, file)
+        if wipe_exclusions[full_path] then
+            print("Skipping excluded path: " .. full_path)
+            os.sleep(short_delay)
+        end
         if not wipe_exclusions[full_path] then
             if filesystem.isDirectory(full_path) then
                 wipeDirectory(full_path) 
                 filesystem.remove(full_path)
-                print(full_path)
+                print("Removed directory: " .. full_path)
             else
                 filesystem.remove(full_path)
-                print(full_path)
+                print("Removed file: " .. full_path)
             end
         end
     end
