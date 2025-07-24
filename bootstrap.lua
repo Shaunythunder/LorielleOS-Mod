@@ -59,5 +59,17 @@ if answer == "n" then
 end
 
 print("Running installer...")
-os.sleep(2)
-os.execute("lua " .. installer_path)
+
+local func, err = load(content, "@/tmp/installer.lua")
+if not func then
+    print("Failed to load installer:" .. err)
+    return
+end
+
+local success, error = pcall(func)
+if not success then
+    print("Installer error: " .. error)
+    return
+end
+
+print("Installer completed successfully.")
