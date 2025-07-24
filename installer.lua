@@ -58,7 +58,7 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Installer!")
+print("Welcome to the LorielleOS Installer! Version 35")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
