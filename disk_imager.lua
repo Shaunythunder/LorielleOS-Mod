@@ -46,7 +46,7 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Imager!")
+print("Welcome to the LorielleOS Imager/Installer v0.2!")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
@@ -77,13 +77,13 @@ if input == "exit" then
 end
 
 input = nil
-target_mnt = nil
+local target_mnt = nil
 local valid_mnt = false
 repeat
-    print("Please ensure you have a floppy disk mounted at /mnt/*floppy*.")
-    print("Make sure you don't enter the hard drive mount.")
+    print("Please ensure you have either a hard drive or floppy disk mounted at /mnt/*target*.")
+    print("Make sure you don't enter the mount of the current OS (OpenOS flopppy or OS hard drive).")
     print("or files may be wiped and install will fail.")
-    io.write("Input 3 character target mnt (type exit to quit, or type info for how to find floppy address): ")
+    io.write("Input 3 character target mnt (type exit to quit, or type info for information on how to find floppy address): ")
     input = io.read()
     if input then 
         input = input:lower() 
@@ -92,7 +92,7 @@ repeat
         print("Invalid input. Please enter exactly 3 characters.")
     end
     if #input == 3 then
-        target_mnt = input:lower()
+        local target_mnt = input:lower()
         local mnt_path = "/mnt/" .. target_mnt .. "/"
         if filesystem.exists(mnt_path) and filesystem.isDirectory(mnt_path) then
             valid_mnt = true
@@ -101,7 +101,7 @@ repeat
         end
     end
     if input == "info" then
-        print("To find the floppy address, follow these steps:")
+        print("To find the floppy or hard drive address, follow these steps:")
         print("1. Exit the installer.")
         print("2. Type cd to get to home.")
         print("3. Then type cd .., cd mnt, ls. This will show you the mounted directories.")
@@ -118,7 +118,7 @@ if input == "exit" then
     return
 end
 
-base_path = "/mnt/" .. target_mnt .. "/"
+local base_path = "/mnt/" .. target_mnt .. "/"
 
 print("Proceeding with installation...")
 os.sleep(short_delay)
@@ -153,8 +153,8 @@ if not clean then
         end
     until response == "yes" or response == "no"
     if response == "no" then
-        print("Install failed, hard drive may be irrecoverable. Reinstall openOS")
-        print("and try again or toss the drive. Good luck!")
+        print("Install failed, drive may be irrecoverable.")
+        print("Try again or toss the drive. Good luck!")
         os.sleep(5)
         return
     end
@@ -190,8 +190,8 @@ if not response then
         end
     until response or input == "no"
     if input == "no" then
-        print("Install failed, hard drive may be irrecoverable. Reinstall openOS")
-        print("and try again or toss the drive. Good luck!")
+        print("Install failed, drive may be irrecoverable.")
+        print("Try again or toss the drive. Good luck!")
         os.sleep(extreme_delay)
         return
     end
@@ -203,7 +203,6 @@ local content = ""
 
 for chunk in response do
     content = content .. chunk
-    print("Received chunk of size: " .. #chunk)
 end
 
 input = nil
@@ -223,8 +222,8 @@ while #content == 0 do
     until input == "yes" or input == "no"
 
     if input == "no" then
-        print("Install failed, hard drive may be irrecoverable. Reinstall openOS")
-        print("and try again or toss the drive. Good luck!")
+        print("Install failed, drive may be irrecoverable.")
+        print("Try again or toss the drive. Good luck!")
         os.sleep(extreme_delay)
         return
     elseif input == "yes" then
@@ -254,8 +253,8 @@ end
 
 for _, filepath in ipairs(files) do
     local url = "https://raw.githubusercontent.com/shaunythunder/LorielleOS-mod/main/" .. filepath
-    print("Downloading " .. filepath .. "...")
-    outpath = filesystem.concat(base_path, filepath)
+    local outpath = filesystem.concat(base_path, filepath)
+    local file_path = filepath
     local file_response = internet.request(url)
     if not file_response then
         print("Failed to download " .. filepath)
@@ -269,27 +268,24 @@ for _, filepath in ipairs(files) do
     local file_content = ""
     for chunk in file_response do
         file_content = file_content .. chunk
-        print("Received chunk of size: " .. #chunk)
     end
 
     local dir = filesystem.path(outpath)
     if dir and not filesystem.exists(dir) then
         filesystem.makeDirectory(dir)
-        print("Created directory: " .. dir)
         os.sleep(short_delay)
     end
 
     local file = io.open(outpath, "w")
     if file then
         file:write(file_content)
-        print(outpath)
+        print("GitHub/LorielleOS-Mod/main/" .. file_path .. " -> " .. outpath)
         file:close()
     else
-        -- This is the line to add/modify:
-        print("!!! CRITICAL ERROR: Failed to open file for writing: " .. filepath .. ". Error: " .. tostring(open_err))
+        print("Failed to open file for writing: " .. filepath .. ". Error: " .. tostring(open_err))
         os.sleep(short_delay)
-        print("Install failed. Hard drive may be irrecoverable.")
-        print("Reinstall openOS and try again or toss the drive. Good luck!")
+        print("This means you picked a read only drive.")
+        print("Run the installer and try again. Good luck!")
         os.sleep(extreme_delay)
         return
     end
