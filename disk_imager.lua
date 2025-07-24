@@ -9,6 +9,12 @@ local short_delay = .5
 local long_delay = 2
 local extreme_delay = 5
 
+local wipe_exclusions = {
+    ["/tmp"] = true,
+    ["/tmp/installer.lua"] = true,
+    ["/tmp/bootstrap.lua"] = true,
+}
+
 local function wipeDirectory(path)
     for file in filesystem.list(path) do
         local full_path = filesystem.concat(path, file)
@@ -136,11 +142,11 @@ print("Wiping hard drive...")
 os.sleep(short_delay)
 wipeDirectory("/mnt/".. target_mnt .. "/")
 os.sleep(short_delay)
-local clean, culprit = checkCleanWipe("/", wipe_exclusions)
+local clean, culprit = checkCleanWipe("/mnt/".. target_mnt .. "/", wipe_exclusions)
 if not clean then
     for i = 1, 5 do
         wipeDirectory("/")
-        clean, culprit = checkCleanWipe("/", wipe_exclusions)
+        clean, culprit = checkCleanWipe("/mnt/".. target_mnt .. "/", wipe_exclusions)
         if clean then
             break
         end
