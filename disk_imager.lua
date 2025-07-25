@@ -1,3 +1,6 @@
+-- LorielleOS Installer/Disk Imager
+-- This script is designed to wipe a disk and install LorielleOS from a manifest file.
+
 local filesystem = require("filesystem")
 local process = require("process")
 local os = require("os")
@@ -9,15 +12,20 @@ local short_delay = .5
 local long_delay = 2
 local extreme_delay = 5
 
+--These aren't technically needed but are here to satisfy an argument.
 local wipe_exclusions = {
     ["/tmp"] = true,
-    ["/tmp/installer.lua"] = true,
+    ["/tmp/disk_imager.lua"] = true,
 }
 
 local function wipeDirectory(path)
+    -- Logic for wiping the target drive
+    -- Uses the inital path (argument: path) to signify the drive to wipe.
     for file in filesystem.list(path) do
+        -- Concatenate is /mnt/path/ + relative file path.
         local full_path = filesystem.concat(path, file)
             if filesystem.isDirectory(full_path) then
+                --Recursive system call to wipe the directory
                 wipeDirectory(full_path) 
                 filesystem.remove(full_path)
                 print("Removed directory: " .. full_path)
@@ -29,16 +37,21 @@ local function wipeDirectory(path)
 end
 
 local function checkCleanWipe(path, exclusions)
+    -- Runs through the directory to make sure that there is nothing left. 
     for file in filesystem.list(path)do
         local full_path = filesystem.concat(path, file)
+        -- Skips over the . and .. directories as those are always present.
+        -- Also skips over any files or directories that are in the exclusions table.
         if file ~= "." and file ~= ".." and not exclusions[full_path] then
             if path == "/" and file == "tmp" then
                 -- Skip the tmp directory to avoid removing it
                 local clean, culprit = checkCleanWipe(full_path, exclusions)
+                -- If there is an issue, it throws an error with the offending file or directory.
                 if not clean then
                     return false, culprit
                 end
             elseif filesystem.isDirectory(full_path) then
+                -- If there is an issue, it throws an error with the offending file or directory.
                 local clean, culprit = checkCleanWipe(full_path, exclusions)
                 if not clean then
                     return false, culprit
@@ -48,10 +61,11 @@ local function checkCleanWipe(path, exclusions)
             end
         end
     end
+    -- If it gets here, then it didn't detect anything.
     return true
 end
 
-print("Welcome to the LorielleOS Installer/Disk Imager v1.0 Alpha!")
+print("Welcome to the LorielleOS Installer/Disk Imager v1.1 Alpha!")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
@@ -60,13 +74,8 @@ os.sleep(short_delay)
 print("USER WARNING: This imager will completely")
 print("wipe your disk and install LorielleOS.")
 print("*************************************")
+print("Failure during installation may result in an unbootable system.")
 os.sleep(short_delay)
-print("If you are sure you want to proceed, type 'install' to continue")
-os.sleep(short_delay)
-print("*************************************")
-print("If you would like to exit the installer, type 'exit' to cancel.")
-os.sleep(short_delay)
-print("**************************************")
 
 local input
 repeat
@@ -77,7 +86,7 @@ repeat
     end
 until input == "install" or input == "exit"
 if input == "exit" then
-    print("Exiting installer. You can run it later by typing 'lua installer.lua'.")
+    print("Exiting disk imager. You can run it later by typing '/tmp/disk_imager.lua'.")
     return
 end
 
@@ -98,6 +107,9 @@ repeat
         print("Invalid input. Please enter exactly 3 characters.")
     end
     if #input == 3 then
+        -- Takes the valid input and sets the mount point.
+        -- It checks if the mount point exists and is a directory.
+        -- If it does, it sets valid_mnt to true.
         target_mnt = input:lower()
         mnt_path = "/mnt/" .. target_mnt .. "/"
         if filesystem.exists(mnt_path) and filesystem.isDirectory(mnt_path) then
@@ -129,7 +141,7 @@ repeat
 
 until valid_mnt or input == "exit"
 if input == "exit" then
-    print("Exiting installer. You can run it later by typing 'lua installer.lua'.")
+    print("Exiting installer. You can run it later by typing '/tmp/disk_imager.lua'.")
     return
 end
 
@@ -143,6 +155,7 @@ wipeDirectory("/mnt/".. target_mnt .. "/")
 os.sleep(short_delay)
 local clean, culprit = checkCleanWipe("/mnt/".. target_mnt .. "/", wipe_exclusions)
 if not clean then
+    -- If the wipe fails, it will try to wipe the directory 5 times.
     for i = 1, 5 do
         wipeDirectory("/")
         clean, culprit = checkCleanWipe("/mnt/".. target_mnt .. "/", wipe_exclusions)
@@ -159,12 +172,12 @@ if not clean then
     print("Installation may fail outright and hard drive irrecoverable.")
     os.sleep(short_delay)
     print("Continue at your own risk.")
-    local response 
-    repeat 
+    local response
+    repeat
         io.write("Do you want to continue installation? (yes/no): ")
         response = io.read()
-        if response then 
-            response = response:lower() 
+        if response then
+            response = response:lower()
         end
     until response == "yes" or response == "no"
     if response == "no" then
@@ -184,6 +197,10 @@ os.sleep(short_delay)
 print("Fetching install manifest...")
 os.sleep(short_delay)
 
+
+-- Pulls install manifest from GitHub.
+-- The manifest is a text file that contains the list of files to be installed.
+-- It is stored in the LorielleOS-Mod repository.
 local manifest_url = "https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/main/install_manifest.txt"
 local response = internet.request(manifest_url)
 if not response then
@@ -191,8 +208,8 @@ if not response then
     os.sleep(short_delay)
     local input
     repeat
-        print("Connect again? Hardrive may be irrecoverable")
-        print("if installer is exited at this point.")
+        print("Connect again? Nothing is written. There is no risk")
+        print("if disk imager is exited at this point.")
         print("Please ensure active internet connection.")
         print("Test by typing " .. manifest_url .. " in browser.")
         io.write("Try again? (yes/no): ")
@@ -205,8 +222,8 @@ if not response then
         end
     until response or input == "no"
     if input == "no" then
-        print("Install failed, drive may be irrecoverable.")
-        print("Try again or toss the drive. Good luck!")
+        print("Install failed. Please check your internet connection.")
+        print("Type /tmp/disk_imager.lua to try again. Good luck!")
         os.sleep(extreme_delay)
         return
     end
@@ -216,6 +233,9 @@ print("Manifest found. Parsing...")
 os.sleep(short_delay)
 local content = ""
 
+-- Handles packets from the response.
+-- It concatenates the chunks into a single string.
+-- The string is the content of the manifest file.
 for chunk in response do
     content = content .. chunk
 end
@@ -225,8 +245,8 @@ while #content == 0 do
    print("Failed to download manifest. Please check your internet connection.")
     os.sleep(1)
     repeat
-        print("Connect again? Hardrive may be irrecoverable")
-        print("if installer is exited at this point.")
+        print("Connect again? Nothing is written. There is no risk")
+        print("if disk imager is exited at this point.")
         print("Please ensure active internet connection.")
         print("Test by typing " .. manifest_url .. " in browser.")
         io.write("Try again? (yes/no): ")
@@ -237,8 +257,8 @@ while #content == 0 do
     until input == "yes" or input == "no"
 
     if input == "no" then
-        print("Install failed, drive may be irrecoverable.")
-        print("Try again or toss the drive. Good luck!")
+        print("Install failed. Please check your internet connection.")
+        print("Type /tmp/disk_imager.lua to try again. Good luck!")
         os.sleep(extreme_delay)
         return
     elseif input == "yes" then
@@ -266,6 +286,7 @@ for line in content:gmatch("[^\r\n]+") do
 end
 
 for _, filepath in ipairs(files) do
+    -- Downloads the file, concats the content into a string and then writes it to the disk.
     local url = "https://raw.githubusercontent.com/shaunythunder/LorielleOS-mod/main/" .. filepath
     local outpath = filesystem.concat(base_path, filepath)
     local file_path = filepath
@@ -274,7 +295,7 @@ for _, filepath in ipairs(files) do
         print("Failed to download " .. filepath)
         os.sleep(short_delay)
         print("Install failed. Hard drive may be irrecoverable.")
-        print("Reinstall openOS and try again or toss the drive. Good luck!")
+        print("Reinstall OpenOS and try again or toss the drive. Good luck!")
         os.sleep(extreme_delay)
         return
     end
@@ -286,12 +307,14 @@ for _, filepath in ipairs(files) do
 
     local dir = filesystem.path(outpath)
     if dir and not filesystem.exists(dir) then
+        -- Creates the directory if it does not exist.
         filesystem.makeDirectory(dir)
         os.sleep(short_delay)
     end
 
     local file = io.open(outpath, "w")
     if file then
+        -- Writes the content to the file.
         file:write(file_content)
         print("GitHub/LorielleOS-Mod/main/" .. file_path .. " -> " .. outpath)
         file:close()
@@ -299,7 +322,7 @@ for _, filepath in ipairs(files) do
         print("Failed to open file for writing: " .. filepath .. ". Error: " .. tostring(open_err))
         os.sleep(short_delay)
         print("This means you picked a read only drive. Computer needs to be restarted.")
-        print("Run the installer and try again. Good luck!")
+        print("Run the disk imager and try again. Good luck!")
         os.sleep(extreme_delay)
         return
     end

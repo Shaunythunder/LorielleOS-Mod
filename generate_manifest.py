@@ -11,6 +11,10 @@ excluded_files = {'README.txt',
 
 excluded_directories = {'.git',}
 
+def checksum(path):
+    with open(path, 'rb') as f:
+        return sum(f.read()) % (2**32)
+
 with open('install_manifest.txt', 'w') as out:
     for root, dirs, files in os.walk('.'):
         dirs[:] = [d for d in dirs if d not in excluded_directories]
