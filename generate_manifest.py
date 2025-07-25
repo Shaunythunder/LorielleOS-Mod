@@ -15,13 +15,18 @@ def checksum(path):
     with open(path, 'rb') as f:
         return sum(f.read()) % (2**32)
 
-with open('install_manifest.txt', 'w') as out:
+with open('install_manifest.lua', 'w') as manifest:
+    manifest.write("return {\n")
     for root, dirs, files in os.walk('.'):
         dirs[:] = [d for d in dirs if d not in excluded_directories]
         # Exclude files in excluded_directories
         for file in files:
             if file not in excluded_files:
-                path = os.path.relpath(os.path.join(root, file))
-                if path.startswith('.' + os.sep):
-                    path = path[2:]
-                out.write(path + '\n')
+                relpath = os.path.relpath(os.path.join(root, file))
+                if relpath.startswith('.' + os.sep):
+                    relpath = relpath[2:]
+                abspath = os.path.join(root, file)
+                size = os.path.getsize(abspath)
+                cksum = checksum(abspath)
+                manifest.write(f"{{filename = '{relpath}', size = {size}, checksum = {cksum}}},\n")
+    manifest.write("}\n")

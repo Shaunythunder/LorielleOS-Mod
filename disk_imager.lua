@@ -65,7 +65,7 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Installer/Disk Imager v1.1 Alpha!")
+print("Welcome to the LorielleOS Installer/Disk Imager v1.2 Alpha!")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
@@ -278,15 +278,11 @@ print("Manifest downloaded successfully.")
 os.sleep(short_delay)
 print("Parsing manifest...")
 
-local files = {}
+local files = dofile("install_manifest.lua")
 
-for line in content:gmatch("[^\r\n]+") do
-    table.insert(files, line)
-
-end
-
-for _, filepath in ipairs(files) do
+for _, entry in ipairs(files) do
     -- Downloads the file, concats the content into a string and then writes it to the disk.
+    local filepath = entry.filename
     local url = "https://raw.githubusercontent.com/shaunythunder/LorielleOS-mod/main/" .. filepath
     local outpath = filesystem.concat(base_path, filepath)
     local file_path = filepath
