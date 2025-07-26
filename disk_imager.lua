@@ -201,7 +201,7 @@ os.sleep(short_delay)
 -- Pulls install manifest from GitHub.
 -- The manifest is a text file that contains the list of files to be installed.
 -- It is stored in the LorielleOS-Mod repository.
-local manifest_url = "https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/main/install_manifest.lua"
+local manifest_url = "https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/main/install_manifest.lua"
 local response = internet.request(manifest_url)
 if not response then
     print("Failed to download manifest. Please check your internet connection.")
