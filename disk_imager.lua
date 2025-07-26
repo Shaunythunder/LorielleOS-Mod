@@ -238,6 +238,7 @@ local content = ""
 -- The string is the content of the manifest file.
 for chunk in response do
     content = content .. chunk
+    print("Received chunk of size: " .. #chunk)
 end
 
 input = nil
