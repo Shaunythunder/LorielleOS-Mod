@@ -65,7 +65,7 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Installer/Disk Imager v1.18 Alpha!")
+print("Welcome to the LorielleOS Installer/Disk Imager v1.1.10 Alpha!")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
@@ -238,6 +238,7 @@ local content = ""
 -- The string is the content of the manifest file.
 for chunk in response do
     content = content .. chunk
+    print("Received chunk of size: " .. #chunk)
 end
 
 input = nil
@@ -273,16 +274,31 @@ while #content == 0 do
     end
 end
 
-local manifest = io.open("install_manifest.lua", "w")
+print("Manifest downloaded successfully.")
+os.sleep(long_delay)
+local manifest = io.open("/tmp/install_manifest.lua", "w")
+if manifest then
+print("Writing manifest to disk...")
+os.sleep(long_delay)
 manifest:write(content)
+print("Manifest written to disk.")
+os.sleep(long_delay)
 manifest:close()
+else
+    print("Failed to open install_manifest.lua for writing. Please check your permissions.")
+    os.sleep(short_delay)
+    print("This means you picked a read only drive. Computer needs to be restarted.")
+    print("Run the disk imager and try again. Good luck!")
+    os.sleep(extreme_delay)
+    return
+end
 
 os.sleep(short_delay)
 print("Manifest downloaded successfully.")
 os.sleep(short_delay)
 print("Parsing manifest...")
 
-local files = dofile("install_manifest.lua")
+local files = dofile("/tmp/install_manifest.lua")
 
 for _, entry in ipairs(files) do
     -- Downloads the file, concats the content into a string and then writes it to the disk.
