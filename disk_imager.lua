@@ -65,7 +65,7 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Installer/Disk Imager v1.3 Alpha!")
+print("Welcome to the LorielleOS Installer/Disk Imager v1.4 Alpha!")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
@@ -272,6 +272,10 @@ while #content == 0 do
         end
     end
 end
+
+local manifest = io.open("install_manifest.lua", "w")
+manifest:write(content)
+manifest:close()
 
 os.sleep(short_delay)
 print("Manifest downloaded successfully.")
