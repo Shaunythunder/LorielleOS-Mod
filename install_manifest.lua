@@ -1,4 +1,5 @@
 return {
+{filename = 'install_manifest.lua', size = 0, checksum = 0},
 {filename = 'init.lua', size = 817, checksum = 66504},
 {filename = '.prop', size = 104, checksum = 9358},
 {filename = 'bin/primary.lua', size = 727, checksum = 62840},

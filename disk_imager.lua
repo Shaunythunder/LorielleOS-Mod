@@ -65,7 +65,7 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Installer/Disk Imager v1.4 Alpha!")
+print("Welcome to the LorielleOS Installer/Disk Imager v1.16 Alpha!")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
@@ -238,7 +238,6 @@ local content = ""
 -- The string is the content of the manifest file.
 for chunk in response do
     content = content .. chunk
-    print("Received chunk of size: " .. #chunk)
 end
 
 input = nil
