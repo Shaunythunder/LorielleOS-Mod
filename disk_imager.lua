@@ -2,8 +2,10 @@
 -- This script is designed to wipe a disk and install LorielleOS from a manifest file.
 
 local filesystem = require("filesystem")
+local component = require("component")
 local process = require("process")
 local os = require("os")
+local table = require("table")
 local io = require("io")
 local print = print
 local internet = require("internet")
@@ -17,6 +19,44 @@ local wipe_exclusions = {
     ["/tmp"] = true,
     ["/tmp/disk_imager.lua"] = true,
 }
+local proxy, reason
+
+local function labelDrive(mnt)
+    print("Labeling drive as 'LorielleOS'...")
+    os.execute("label /mnt/" .. mnt .. " " .. "LorielleOS")
+end
+
+local function checkValidMounts()
+    local running_OS_mount_address = filesystem.get("/home")
+    local valid_mnts = {}
+    for mnt in filesystem.list("/mnt") do
+        local mnt_path = filesystem.concat("/mnt", mnt)
+        local mnt_address = filesystem.get(mnt_path)
+        if mnt_address ~= running_OS_mount_address then
+            local file_path = filesystem.concat(mnt_path, "fhae45q54h789qthq43w8thfw78hfgew.lua")
+            local file = io.open(file_path, "w")
+            if file then
+                file:close()
+                filesystem.remove(file_path)
+                table.insert(valid_mnts, mnt)
+            end
+        end
+    end
+    return valid_mnts
+end
+
+local function printValidMounts()
+    local mounts = checkValidMounts()
+    if #mounts == 0 then
+        print("No valid mounts found.")
+        return
+    end
+    print("Available mounts:")
+    for _, mnt in ipairs(mounts) do
+        mnt = string.sub(mnt, 1, 3) -- Ensure only the first 3 characters are used
+        print(mnt)
+    end
+end
 
 local function wipeDirectory(path)
     -- Logic for wiping the target drive
@@ -65,40 +105,20 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Installer/Disk Imager v1.1.10 Alpha!")
-print("*************************************")
+print("Welcome to LorielleOS Installer/Disk Imager v1.0!")
 os.sleep(short_delay)
-print("Intended for use with OpenComputers.")
-print("*************************************")
+print("USER WARNING: This imager will completely wipe your disk and install LorielleOS.")
 os.sleep(short_delay)
-print("USER WARNING: This imager will completely")
-print("wipe your disk and install LorielleOS.")
-print("*************************************")
 print("Failure during installation may result in an unbootable system.")
 os.sleep(short_delay)
 
 local input
-repeat
-    io.write("Wipe disk and install? (install/exit):")
-    input = io.read()
-    if input then 
-        input = input:lower()
-    end
-until input == "install" or input == "exit"
-if input == "exit" then
-    print("Exiting disk imager. You can run it later by typing '/tmp/disk_imager.lua'.")
-    return
-end
-
-input = nil
 local target_mnt = nil
 local valid_mnt = false
 local mnt_path = nil
 repeat
-    print("Please ensure you have either a hard drive or floppy disk mounted at /mnt/*target*.")
-    print("Make sure you don't enter the mount of the current OS (OpenOS flopppy or OS hard drive).")
-    print("or files may be wiped and install will fail.")
-    io.write("Input 3 character target mnt (type exit to quit, or type info for information on how to find floppy address): ")
+    printValidMounts()
+    io.write("Input 3 character target mnt (XXX/exit/info): ")
     input = io.read()
     if input then 
         input = input:lower() 
@@ -119,7 +139,7 @@ repeat
         end
     end
     if input == "info" then
-        print("To find the floppy or hard drive address, follow these steps:")
+        print("To find the floppy or hard drive address manually, follow these steps:")
         print("1. Exit the installer.")
         os.sleep(long_delay)
         print("2. Type cd to get to home.")
@@ -130,18 +150,20 @@ repeat
         os.sleep(long_delay)
         print("5. Put the floppy back in and type ls again. the three character code that appears is the floppy address.")
         os.sleep(long_delay)
-        print("The three digit code that stays is your hard drive address.")
+        print("The three digit code that stays is your OS address.")
         os.sleep(long_delay)
-        print("DO NOT USE THE HARD DRIVE ADDRESS. If there are multiple drives you'll see multiple codes.")
+        print("DO NOT USE THE OS ADDRESS. If there are multiple drives you'll see multiple codes.")
         os.sleep(long_delay)
-        print("6. Type cd to return to home, then run the installer again.")
+        print("You can enter in a three character code to select the drive even if not listed in writable mounts, but install will fail if drive is read only.")
+        os.sleep(long_delay)
+        print("6. Type cd to return to home, then run the disk imager again.")
         os.sleep(long_delay)
         
     end
 
 until valid_mnt or input == "exit"
 if input == "exit" then
-    print("Exiting installer. You can run it later by typing '/tmp/disk_imager.lua'.")
+    print("Exiting disk imager.")
     return
 end
 
@@ -223,7 +245,6 @@ if not response then
     until response or input == "no"
     if input == "no" then
         print("Install failed. Please check your internet connection.")
-        print("Type /tmp/disk_imager.lua to try again. Good luck!")
         os.sleep(extreme_delay)
         return
     end
@@ -238,7 +259,6 @@ local content = ""
 -- The string is the content of the manifest file.
 for chunk in response do
     content = content .. chunk
-    print("Received chunk of size: " .. #chunk)
 end
 
 input = nil
@@ -259,7 +279,6 @@ while #content == 0 do
 
     if input == "no" then
         print("Install failed. Please check your internet connection.")
-        print("Type /tmp/disk_imager.lua to try again. Good luck!")
         os.sleep(extreme_delay)
         return
     elseif input == "yes" then
@@ -268,37 +287,34 @@ while #content == 0 do
             content = ""
             for chunk in response do
                 content = content .. chunk
-                print("Received chunk of size: " .. #chunk)
             end
         end
     end
 end
 
 print("Manifest downloaded successfully.")
-os.sleep(long_delay)
-local manifest = io.open("/tmp/install_manifest.lua", "w")
+local manifest_path = filesystem.concat(base_path, "install_manifest.lua")
+local manifest = io.open(manifest_path, "w")
 if manifest then
 print("Writing manifest to disk...")
-os.sleep(long_delay)
 manifest:write(content)
 print("Manifest written to disk.")
-os.sleep(long_delay)
 manifest:close()
 else
     print("Failed to open install_manifest.lua for writing. Please check your permissions.")
     os.sleep(short_delay)
-    print("This means you picked a read only drive. Computer needs to be restarted.")
-    print("Run the disk imager and try again. Good luck!")
+    print("This means you picked a read only drive or you picked your current OS. Computer needs to be restarted.")
+    print("If you picked your current OS, it may not be bootable.")
+    print("Run the disk imager and try again.")
     os.sleep(extreme_delay)
     return
 end
 
-os.sleep(short_delay)
 print("Manifest downloaded successfully.")
 os.sleep(short_delay)
 print("Parsing manifest...")
 
-local files = dofile("/tmp/install_manifest.lua")
+local files = dofile(manifest_path)
 
 for _, entry in ipairs(files) do
     -- Downloads the file, concats the content into a string and then writes it to the disk.
@@ -311,7 +327,6 @@ for _, entry in ipairs(files) do
         print("Failed to download " .. filepath)
         os.sleep(short_delay)
         print("Install failed. Hard drive may be irrecoverable.")
-        print("Reinstall OpenOS and try again or toss the drive. Good luck!")
         os.sleep(extreme_delay)
         return
     end
@@ -338,14 +353,15 @@ for _, entry in ipairs(files) do
         print("Failed to open file for writing: " .. filepath .. ". Error: " .. tostring(open_err))
         os.sleep(short_delay)
         print("This means you picked a read only drive. Computer needs to be restarted.")
-        print("Run the disk imager and try again. Good luck!")
+        print("Run the disk imager and try again.")
         os.sleep(extreme_delay)
         return
     end
 end
+
 print("All files downloaded and installed on disk.")
 os.sleep(short_delay)
+labelDrive(target_mnt)
 print("LorielleOS installation complete!")
 os.sleep(short_delay)
-print("If you are running this on a hard drive, remove any floppy disks and reboot the computer.")
-os.sleep(short_delay)
+print("Remove any openos floppy disks or hard drives and reboot the computer.")

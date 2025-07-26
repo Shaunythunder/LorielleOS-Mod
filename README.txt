@@ -30,7 +30,7 @@ wget https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/m
     3a. The first command will cause the installer to get wiped whenever you shut off the computer as it is in RAM. If you would like to keep it.
         run the following command.
     3b. wget https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/main/disk_imager.lua disk_imager.lua
-    3c. For dev: wget http://localhost:8000/disk_imager.lua /tmp/disk_imager.lua && lua /tmp/disk_imager.lua
+    3c. For dev: rm -rf /tmp/disk_imager.lua && wget http://localhost:8000/disk_imager.lua /tmp/disk_imager.lua && lua /tmp/disk_imager.lua
 4. Type the following commands:
     4a. cd /mnt
     4b. ls
