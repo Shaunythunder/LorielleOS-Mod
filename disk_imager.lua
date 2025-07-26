@@ -65,7 +65,7 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to the LorielleOS Installer/Disk Imager v1.16 Alpha!")
+print("Welcome to the LorielleOS Installer/Disk Imager v1.17 Alpha!")
 print("*************************************")
 os.sleep(short_delay)
 print("Intended for use with OpenComputers.")
