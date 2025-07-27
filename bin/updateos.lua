@@ -82,16 +82,24 @@ local function deleteAndReplace(base_path, file)
         if file then
             -- Writes the content to the file.
             file:write(file_content)
-            print("Updating " .. file_path)
             file:close()
             return true
         end
 end
 
-print("Welcome to LorielleOS Updater v0.1.12 beta!")
+print("Welcome to LorielleOS Updater v1.0!")
 os.sleep(short_delay)
 print("Do not shut down the computer while the updater is running.")
 os.sleep(short_delay)
+
+if not filesystem.exists("/install_manifest.lua") then
+    print("No install manifest found in root. Cannot update.")
+    os.sleep(short_delay)
+    print("Please reinstall LorielleOS.")
+    os.sleep(extreme_delay)
+    return
+end
+
 print("Fetching update manifest...")
 os.sleep(short_delay)
 
@@ -189,7 +197,7 @@ if #updates_needed == 0 then
     print("No updates needed. Exiting updater.")
     return
 end
-print("Updates needed!" .. #updates_needed .. " files to update.")
+print("Updates needed! " .. #updates_needed .. " files to update.")
 os.sleep(short_delay)
 for i, update in ipairs(updates_needed) do
     print("Updating file " .. i .. " of " .. #updates_needed .. ": " .. update)
@@ -204,5 +212,5 @@ for i, update in ipairs(updates_needed) do
 end
 os.execute("cp /tmp/install_manifest.lua /install_manifest.lua")
 
-print("All files updated. Exiting updater.")
+print("All files updated!")
 os.sleep(short_delay)
