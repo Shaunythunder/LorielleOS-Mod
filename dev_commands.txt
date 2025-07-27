@@ -1,0 +1,2 @@
+rm -rf /tmp/disk_imager.lua && wget http://localhost:8000/disk_imager.lua /tmp/disk_imager.lua && lua /tmp/disk_imager.lua
+rm -rf /bin/updateos.lua && wget http://localhost:8000/bin/updateos.lua /bin/updateos.lua && updateos

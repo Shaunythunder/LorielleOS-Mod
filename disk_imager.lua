@@ -105,13 +105,14 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to LorielleOS Installer/Disk Imager v1.0!")
+print("Welcome to LorielleOS Installer/Disk Imager v2.1!")
 os.sleep(short_delay)
 print("USER WARNING: This imager will completely wipe your disk and install LorielleOS.")
 os.sleep(short_delay)
 print("Failure during installation may result in an unbootable system.")
 os.sleep(short_delay)
 
+::new_disk::
 local input
 local target_mnt = nil
 local valid_mnt = false
@@ -364,4 +365,37 @@ os.sleep(short_delay)
 labelDrive(target_mnt)
 print("LorielleOS installation complete!")
 os.sleep(short_delay)
-print("Remove any openos floppy disks or hard drives and reboot the computer.")
+print("If installing from OpenOS, remove any OpenOS floppy disks or hard drives and reboot the computer.")
+
+input = nil
+repeat
+    io.write("Install to another disk? (yes/no/reboot): ")
+    input = io.read()
+    if input then
+        input = input:lower()
+    end
+until input == "yes" or input == "no" or input == "reboot"
+if input == "yes" then
+    print("Please insert another disk or drive.")
+    os.sleep(short_delay)
+    local answer
+    repeat
+    io.write("Have you inserted another disk or drive? (yes/exit): ")
+    answer = io.read()
+    if answer then
+        answer = answer:lower()
+    end
+    until answer == "yes" or answer == "exit"
+    if answer == "exit" then
+        print("Exiting disk imager.")
+        return
+    end
+    goto new_disk
+elseif input == "no" then
+    print("Exiting disk imager.")
+elseif input == "reboot" then
+    print("Rebooting computer...")
+    os.sleep(short_delay)
+    os.execute("reboot")
+end
+print("Disk imager exited.")
