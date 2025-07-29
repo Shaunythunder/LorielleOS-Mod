@@ -197,7 +197,12 @@ if #updates_needed == 0 then
     print("No updates needed. Exiting updater.")
     return
 end
-print("Updates needed! " .. #updates_needed .. " files to update.")
+if #updates_needed == 1 then
+    print("Update needed! 1 file to be updated.")
+else
+    print("Updates needed!  " .. #updates_needed .. " files to update.")
+end
+
 os.sleep(short_delay)
 for i, update in ipairs(updates_needed) do
     print("Updating file " .. i .. " of " .. #updates_needed .. ": " .. update)
@@ -214,3 +219,6 @@ os.execute("cp /tmp/install_manifest.lua /install_manifest.lua")
 
 print("All files updated!")
 os.sleep(short_delay)
+print("Restarting Computer...")
+os.sleep(1.5)
+os.execute("reboot")

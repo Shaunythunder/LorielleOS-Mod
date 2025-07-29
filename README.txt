@@ -26,7 +26,7 @@ Features will be added as issues come up.
 1. Insert the OpenOS floppy
 2. Start the computer
 3. Run the following command:
-wget https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/main/disk_imager.lua /tmp/disk_imager.lua
+wget https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/main/disk_imager.lua /tmp/disk_imager.lua && /tmp/disk_imager
     3a. The first command will cause the installer to get wiped whenever you shut off the computer as it is in RAM. If you would like to keep it.
         run the following command.
     3b. wget https://raw.githubusercontent.com/Shaunythunder/LorielleOS-Mod/refs/heads/main/disk_imager.lua disk_imager.lua

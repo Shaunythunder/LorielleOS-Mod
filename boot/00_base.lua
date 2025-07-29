@@ -1,3 +1,5 @@
+_G.IN_PAGER = false
+
 function loadfile(filename, ...)
   if filename:sub(1,1) ~= "/" then
     filename = (os.getenv("PWD") or "/") .. "/" .. filename
@@ -33,10 +35,20 @@ function print(...)
   local args = table.pack(...)
   local stdout = io.stdout
   local pre = ""
+  local history_message = ""
   for i = 1, args.n do
-    stdout:write(pre, (assert(tostring(args[i]), "'tostring' must return a string to 'print'")))
+    local print_string = ((assert(tostring(args[i]), "'tostring' must return a string to 'print'")))
+    stdout:write(pre, print_string)
+    history_message = history_message .. pre .. print_string
     pre = "\t"
   end
   stdout:write("\n")
   stdout:flush()
+  if not _G.IN_PAGER then
+    local history_file = io.open("/tmp/history.txt", "a")
+    if history_file then
+      history_file:write(history_message .. "\n")
+      history_file:close()
+    end
+  end
 end

@@ -1,6 +1,7 @@
 return {
-{filename = 'dev_commands.txt', size = 224, checksum = 19897},
+{filename = 'dev_commands.txt', size = 240, checksum = 21553},
 {filename = 'install_manifest.lua', size = 0, checksum = 0},
+{filename = 'disk_imager_dev.lua', size = 13891, checksum = 1120991},
 {filename = 'init.lua', size = 817, checksum = 66504},
 {filename = '.prop', size = 104, checksum = 9358},
 {filename = 'bin/primary.lua', size = 727, checksum = 62840},
@@ -21,7 +22,7 @@ return {
 {filename = 'bin/alias.lua', size = 1293, checksum = 105036},
 {filename = 'bin/set.lua', size = 485, checksum = 34034},
 {filename = 'bin/rm.lua', size = 4007, checksum = 333438},
-{filename = 'bin/updateos.lua', size = 6503, checksum = 534862},
+{filename = 'bin/updateos.lua', size = 6666, checksum = 549519},
 {filename = 'bin/lua.lua', size = 684, checksum = 57636},
 {filename = 'bin/rmdir.lua', size = 2667, checksum = 213813},
 {filename = 'bin/cat.lua', size = 922, checksum = 72708},
