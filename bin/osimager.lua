@@ -66,7 +66,7 @@ local function checkValidMounts()
                 table.insert(valid_mnts, mnt)
             end
         else 
-            local os_mnt = mnt
+            os_mnt = mnt
         end
     end
     return valid_mnts, os_mnt
@@ -254,6 +254,8 @@ os.sleep(short_delay)
 print("Parsing manifest...")
 os.sleep(short_delay)
 local manifest = dofile("/install_manifest.lua")
+print("Manifest parsed successfully.")
+os.sleep(long_delay)
 
 
 if cloneOS(os_mnt, target_mnt, manifest) then
