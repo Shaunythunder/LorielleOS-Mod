@@ -2,8 +2,6 @@
 -- This script is designed to wipe a disk and install LorielleOS from a manifest file.
 
 local filesystem = require("filesystem")
-local component = require("component")
-local process = require("process")
 local os = require("os")
 local table = require("table")
 local io = require("io")
@@ -19,7 +17,6 @@ local wipe_exclusions = {
     ["/tmp"] = true,
     ["/tmp/disk_imager.lua"] = true,
 }
-local proxy, reason
 
 local function labelDrive(mnt)
     print("Labeling drive as 'LorielleOS'...")
@@ -105,7 +102,7 @@ local function checkCleanWipe(path, exclusions)
     return true
 end
 
-print("Welcome to LorielleOS Installer/Disk Imager v2.1!")
+print("Welcome to LorielleOS Installer/Disk Imager v2.2.1!")
 os.sleep(short_delay)
 print("USER WARNING: This imager will completely wipe your disk and install LorielleOS.")
 os.sleep(short_delay)
@@ -118,13 +115,14 @@ local target_mnt = nil
 local valid_mnt = false
 local mnt_path = nil
 repeat
+    ::refresh::
     printValidMounts()
-    io.write("Input 3 character target mnt (XXX/exit/info): ")
+    io.write("Input 3 character target mnt (XXX/refresh/exit/info): ")
     input = io.read()
     if input then 
         input = input:lower() 
     end
-    if input and #input ~= 3 and input ~= "exit" and input ~= "info" then
+    if input and #input ~= 3 and input ~= "exit" and input ~= "info" and input ~= "refresh" then
         print("Invalid input. Please enter exactly 3 characters.")
     end
     if #input == 3 then
@@ -159,7 +157,12 @@ repeat
         os.sleep(long_delay)
         print("6. Type cd to return to home, then run the disk imager again.")
         os.sleep(long_delay)
-        
+    end
+    if input == "refresh" then
+        -- Refreshes the list of valid mounts.
+        print("Refreshing mount list...")
+        os.sleep(short_delay)
+        goto refresh
     end
 
 until valid_mnt or input == "exit"

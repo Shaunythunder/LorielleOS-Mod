@@ -1,7 +1,7 @@
 -- called from /init.lua
 local raw_loadfile = ...
 
-_G._OSVERSION = "LorielleOS v0.1"
+_G._OSVERSION = "LorielleOS v0.4"
 
 -- luacheck: globals component computer unicode _OSVERSION
 local component = component
