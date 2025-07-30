@@ -100,6 +100,15 @@ function io.type(object)
 end
 
 function io.write(...)
+  local log_input_message = table.concat({...}, "")
+  if not _G.IN_PAGER then
+  local timestamp = "[" .. os.date("%H:%M:%S") .. "]"
+  local file = io.open("/tmp/sh_history.log", "a")
+  if file then
+    file:write(timestamp .. " " .. log_input_message)
+    file:close()
+    end
+  end
   return io.output():write(...)
 end
 

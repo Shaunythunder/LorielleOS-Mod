@@ -3,15 +3,19 @@ local shell = require("shell")
 local unicode = require("unicode")
 local term = require("term") -- using term for negative scroll feature
 
+_G.IN_PAGER = true
+
 local args, ops = shell.parse(...)
 if #args > 1 then
   io.write("Usage: ", os.getenv("_"):match("/([^/]+)%.lua$"), " <filename>\n")
   io.write("- or no args reads stdin\n")
+  _G.IN_PAGER = false
   return 1
 end
 
 local cat_cmd = table.concat({"cat", ...}, " ")
 if not io.output().tty then
+  _G.IN_PAGER = false
   return os.execute(cat_cmd)
 end
 
@@ -82,6 +86,7 @@ end
 local function status()
   if end_of_buffer then
     if ops.noback then
+      _G.IN_PAGER = false
       os.exit()
     end
     io.write("(END)")
@@ -120,6 +125,13 @@ local function goforward(n)
   bottom = bottom + line_count
 end
 
+
+if ops.history then
+  while not end_of_buffer do
+    goforward(math.huge)
+  end
+end
+
 goforward(height - 1)
 
 while true do
@@ -131,6 +143,7 @@ while true do
   elseif e == "key_down" then
     if code == keys.q then
       term.clearLine()
+      _G.IN_PAGER = false
       os.exit() -- abort
     elseif code == keys["end"] then
       goforward(math.huge)
@@ -147,3 +160,5 @@ while true do
     end
   end
 end
+
+_G.IN_PAGER = false

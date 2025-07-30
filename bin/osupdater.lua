@@ -15,6 +15,7 @@ local long_delay = 2
 local extreme_delay = 5
 
 local manifest_download_path
+local download_path
 if options.d then 
     -- d is for dev. This is used for development purposes.
     -- It sets the download path to a local server.
@@ -87,7 +88,7 @@ local function deleteAndReplace(base_path, file)
         end
 end
 
-print("Welcome to LorielleOS Updater v1.0!")
+print("Welcome to LorielleOS Updater v1.1!")
 os.sleep(short_delay)
 print("Do not shut down the computer while the updater is running.")
 os.sleep(short_delay)
@@ -130,7 +131,7 @@ end
 
 print("Manifest found. Parsing...")
 os.sleep(short_delay)
-local content = ""
+local manifest_content = ""
 
 
 -- Handles packets from the response.
@@ -138,11 +139,11 @@ local content = ""
 -- The string is the content of the manifest file.
 
 for chunk in response do
-    content = content .. chunk
+    manifest_content = manifest_content .. chunk
 end
 
 local input = nil
-while #content == 0 do
+while #manifest_content == 0 do
    print("Failed to download manifest. Please check your internet connection.")
     os.sleep(1)
     repeat
@@ -160,20 +161,20 @@ while #content == 0 do
     elseif input == "yes" then
         response = internet.request(manifest_url)
         if response then
-            content = ""
+            manifest_content = ""
             for chunk in response do
-                content = content .. chunk
+                manifest_content = manifest_content .. chunk
             end
         end
     end
 end
 
 local manifest_path = "/tmp/install_manifest.lua"
-local manifest = io.open(manifest_path, "w")
+local temp_manifest = io.open(manifest_path, "w")
 
-if manifest then
-manifest:write(content)
-manifest:close()
+if temp_manifest then
+temp_manifest:write(manifest_content)
+temp_manifest:close()
 else
     print("Failed to open install_manifest.lua for writing. Please check your permissions.")
     os.sleep(short_delay)
@@ -215,7 +216,21 @@ for i, update in ipairs(updates_needed) do
         return
     end
 end
-os.execute("cp /tmp/install_manifest.lua /install_manifest.lua")
+
+filesystem.remove("/install_manifest.lua")
+local os_manifest_path = "/install_manifest.lua"
+local os_manifest = io.open(os_manifest_path, "w")
+
+if os_manifest then
+os_manifest:write(manifest_content)
+os_manifest:close()
+else
+    print("Failed to open install_manifest.lua for writing. Please check your permissions.")
+    os.sleep(short_delay)
+    print("Exiting updater.")
+    os.sleep(extreme_delay)
+    return
+end
 
 print("All files updated!")
 os.sleep(short_delay)
